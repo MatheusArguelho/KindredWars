@@ -79,10 +79,7 @@
 
             <!-- Gráficos de barras por tipo de carta (também com títulos gerados pelo Plotly) -->
             {% for tipo, graph in tipo_graphs.items() %}
-            <div class="graph">
-                <!-- O título do gráfico é gerado pelo Plotly, então removemos o título extra aqui -->
-                {{ graph | safe }}
-            </div>
+                <div>{{ graph | safe }}</div>
             {% endfor %}
         </div>
     </div>

@@ -1,6 +1,9 @@
 import pandas as pd
 import plotly.express as px
 from flask import Flask, render_template
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
 
 # ==============================================
 # 1. CARREGAMENTO E PRÉ-PROCESSAMENTO DOS DADOS
@@ -58,6 +61,71 @@ for tipo in tipos:
 
 app = Flask(__name__)
 
+# Configuração do Dash integrado com Flask
+dash_app = dash.Dash(__name__, server=app, url_base_pathname='/dashboard/')
+
+# Definindo o layout do Dash
+dash_app.layout = html.Div([
+    # Filtro de tipo
+    dcc.Dropdown(
+        id='tipo-dropdown',
+        options=[{'label': tipo, 'value': tipo} for tipo in tipos],
+        value=tipos[0],  # Valor padrão
+        style={'width': '50%'}
+    ),
+
+    # Filtro de cor (dropdown com WUBRG)
+    dcc.Dropdown(
+        id='cor-dropdown',
+        options=[
+            {'label': 'White', 'value': 'W'},
+            {'label': 'Blue', 'value': 'U'},
+            {'label': 'Black', 'value': 'B'},
+            {'label': 'Red', 'value': 'R'},
+            {'label': 'Green', 'value': 'G'}
+        ],
+        multi=True,  # Permite a seleção de múltiplas cores
+        value=None,  # Valor padrão (todas as cores)
+        style={'width': '50%', 'margin-top': '20px'}
+    ),
+
+    # Gráfico
+    dcc.Graph(id='graph')
+])
+
+
+# Callback para atualizar o gráfico com base na seleção do dropdown de tipo e cores
+@dash_app.callback(
+    Output('graph', 'figure'),
+    [Input('tipo-dropdown', 'value'),
+     Input('cor-dropdown', 'value')]
+)
+def update_graph(tipo, cores):
+    # Filtra os dados com base no tipo
+    tipo_comum = df[df['Tipo'].str.contains(tipo, case=False, na=False)]
+
+    # Filtra os dados com base nas cores selecionadas (verifica se a string de cores contém todas as cores selecionadas)
+    if cores:
+        tipo_comum = tipo_comum[tipo_comum['Cor'].apply(lambda x: all(cor in x for cor in cores))]
+
+    # Recalcula as cartas mais comuns após os filtros
+    tipo_comum = tipo_comum.groupby('Nome')['Deck'].nunique().sort_values(ascending=False)
+
+    fig = px.bar(tipo_comum.head(top_x),  # Usando top_x para definir o número de itens
+                 x=tipo_comum.head(top_x).index,
+                 y=tipo_comum.head(top_x).values,
+                 title=f"Top {top_x} Cartas do Tipo {tipo}",
+                 labels={'x': 'Carta', 'y': 'Número de Decks'},
+                 template='plotly')
+
+    fig.update_layout(
+        autosize=True,
+        margin=dict(l=10, r=10, t=40, b=40)
+    )
+    return fig
+
+
+# Rota para a página principal do Flask
 @app.route('/')
 def index():
     # Gráfico de barras: Top X Decks Mais Caros
@@ -91,6 +159,7 @@ def index():
     # Criação dos gráficos para os tipos de carta
     tipo_graphs = {tipo: tipos_graficos[tipo] for tipo in tipos}
 
+    # Passa as variáveis para o template HTML
     return render_template('index.html',
                            num_decks_distintos=num_decks_distintos,
                            graph_preco_decks=graph_preco_decks,
@@ -98,6 +167,7 @@ def index():
                            graph_cartas_comuns=graph_cartas_comuns,
                            tipo_graphs=tipo_graphs,
                            top_x=top_x)  # Passa a variável top_x para o HTML, se precisar para referência
+
 
 if __name__ == '__main__':
     app.run(debug=True)
