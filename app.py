@@ -20,7 +20,6 @@ df_sem_land = df[df['Tipo'] != 'Basic Land']
 # ==============================================
 
 num_decks_distintos = df['Deck'].nunique()
-media_cartas_por_deck = df.groupby('Deck')['Nome'].count().mean()
 comandantes_decks = df[df['Comandante'] == 1].groupby('Deck').first()
 preco_por_deck = df.groupby('Deck')['Preco_USD'].sum().sort_values(ascending=False)
 cores_comandantes = comandantes_decks['Cor'].value_counts()
@@ -36,6 +35,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    # Gráfico de barras: Top 10 Decks Mais Caros
     fig_preco_decks = px.bar(preco_por_deck.head(10),
                              x=preco_por_deck.head(10).index,
                              y=preco_por_deck.head(10).values,
@@ -43,26 +43,44 @@ def index():
                              labels={'x': 'Deck', 'y': 'Preço Total (USD)'},
                              template='plotly')
 
+    # Gráfico de pizza: Distribuição de Cores nos Comandantes
     fig_cores_comandantes = px.pie(cores_comandantes,
                                    names=cores_comandantes.index,
                                    values=cores_comandantes.values,
                                    title="Distribuição de Cores nos Comandantes",
                                    template='plotly')
 
+    # Gráfico de barras: Top 10 Cartas Mais Comuns Entre Decks (Sem 'Land')
     fig_cartas_comuns = px.bar(cartas_comuns.head(10),
                                x=cartas_comuns.head(10).index,
                                y=cartas_comuns.head(10).values,
-                               title="Top 10 Cartas Mais Comuns Entre Decks (Excluindo terreno basico)",
+                               title="Top 10 Cartas Mais Comuns Entre Decks (Sem 'Land')",
                                labels={'x': 'Carta', 'y': 'Número de Decks'},
                                template='plotly')
 
+    # Ajuste de layout para tornar os gráficos responsivos
+    fig_preco_decks.update_layout(
+        autosize=True,
+        margin=dict(l=10, r=10, t=40, b=40)
+    )
+
+    fig_cores_comandantes.update_layout(
+        autosize=True,
+        margin=dict(l=10, r=10, t=40, b=40)
+    )
+
+    fig_cartas_comuns.update_layout(
+        autosize=True,
+        margin=dict(l=10, r=10, t=40, b=40)
+    )
+
+    # Converte os gráficos para HTML
     graph_preco_decks = fig_preco_decks.to_html(full_html=False)
     graph_cores_comandantes = fig_cores_comandantes.to_html(full_html=False)
     graph_cartas_comuns = fig_cartas_comuns.to_html(full_html=False)
 
     return render_template('index.html',
                            num_decks_distintos=num_decks_distintos,
-                           #media_cartas_por_deck="{:.2f}".format(media_cartas_por_deck),
                            graph_preco_decks=graph_preco_decks,
                            graph_cores_comandantes=graph_cores_comandantes,
                            graph_cartas_comuns=graph_cartas_comuns)
