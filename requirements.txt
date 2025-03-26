@@ -1,5 +1,5 @@
-dash==3.1.0
-Flask==3.1.0
+dash
+Flask
 pandas==2.2.3
 plotly==6.0.1
 gunicorn==23.0.0
