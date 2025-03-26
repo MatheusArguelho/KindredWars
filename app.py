@@ -27,11 +27,35 @@ cores_comandantes = comandantes_decks['Cor'].value_counts()
 # Cartas mais comuns entre decks (sem contar "Land")
 cartas_comuns = df_sem_land.groupby('Nome')['Deck'].nunique().sort_values(ascending=False)
 
+# Filtra os dados com base em tipos de cartas específicos
+tipos = ['Land', 'Creature', 'Artifact', 'Enchantment', 'Planeswalker', 'Battle', 'Instant', 'Sorcery']
+
+# Cria gráficos de barras para cada tipo
+tipos_graficos = {}
+for tipo in tipos:
+    tipo_cartas = df[df['Tipo'].str.contains(tipo, case=False, na=False)]
+    tipo_comum = tipo_cartas.groupby('Nome')['Deck'].nunique().sort_values(ascending=False)
+
+    fig = px.bar(tipo_comum.head(10),
+                 x=tipo_comum.head(10).index,
+                 y=tipo_comum.head(10).values,
+                 title=f"Top 10 Cartas do Tipo {tipo}",
+                 labels={'x': 'Carta', 'y': 'Número de Decks'},
+                 template='plotly')
+
+    fig.update_layout(
+        autosize=True,
+        margin=dict(l=10, r=10, t=40, b=40)
+    )
+
+    tipos_graficos[tipo] = fig.to_html(full_html=False)
+
 # ==============================================
 # 3. CRIAÇÃO DO FLASK COM PLOTLY
 # ==============================================
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
@@ -58,32 +82,21 @@ def index():
                                labels={'x': 'Carta', 'y': 'Número de Decks'},
                                template='plotly')
 
-    # Ajuste de layout para tornar os gráficos responsivos
-    fig_preco_decks.update_layout(
-        autosize=True,
-        margin=dict(l=10, r=10, t=40, b=40)
-    )
-
-    fig_cores_comandantes.update_layout(
-        autosize=True,
-        margin=dict(l=10, r=10, t=40, b=40)
-    )
-
-    fig_cartas_comuns.update_layout(
-        autosize=True,
-        margin=dict(l=10, r=10, t=40, b=40)
-    )
-
     # Converte os gráficos para HTML
     graph_preco_decks = fig_preco_decks.to_html(full_html=False)
     graph_cores_comandantes = fig_cores_comandantes.to_html(full_html=False)
     graph_cartas_comuns = fig_cartas_comuns.to_html(full_html=False)
 
+    # Criação dos gráficos para os tipos de carta
+    tipo_graphs = {tipo: tipos_graficos[tipo] for tipo in tipos}
+
     return render_template('index.html',
                            num_decks_distintos=num_decks_distintos,
                            graph_preco_decks=graph_preco_decks,
                            graph_cores_comandantes=graph_cores_comandantes,
-                           graph_cartas_comuns=graph_cartas_comuns)
+                           graph_cartas_comuns=graph_cartas_comuns,
+                           tipo_graphs=tipo_graphs)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

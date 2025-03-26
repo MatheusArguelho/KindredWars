@@ -50,6 +50,14 @@
                 <h3>Top 10 Cartas Mais Comuns Entre Decks (Sem 'Land')</h3>
                 {{ graph_cartas_comuns | safe }}
             </div>
+
+            <!-- Gráficos de barras por tipo de carta -->
+            {% for tipo, graph in tipo_graphs.items() %}
+            <div class="graph">
+                <h3>{{ tipo }} - Top 10 Cartas</h3>
+                {{ graph | safe }}
+            </div>
+            {% endfor %}
         </div>
     </div>
 </body>
