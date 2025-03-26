@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Decks de Magic: The Gathering</title>
+</head>
+<body>
+    <h1>Análise de Decks de Magic: The Gathering</h1>
+
+    <div>
+        <h3>Número de decks distintos: {{ num_decks_distintos }}</h3>
+        <h3>Número médio de cartas por deck: {{ media_cartas_por_deck }}</h3>
+    </div>
+
+    <div>
+        <h3>Top 10 Decks Mais Caros</h3>
+        {{ graph_preco_decks | safe }}
+    </div>
+
+    <div>
+        <h3>Distribuição de Cores nos Comandantes</h3>
+        {{ graph_cores_comandantes | safe }}
+    </div>
+
+    <div>
+        <h3>Top 10 Cartas Mais Comuns Entre Decks</h3>
+        {{ graph_cartas_comuns | safe }}
+    </div>
+</body>
+</html>
