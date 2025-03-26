@@ -4,28 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Decks de Magic: The Gathering</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #2d2d2d;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .stats h3 {
+            margin: 10px 0;
+        }
+
+        .charts {
+            margin-top: 30px;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Análise de Decks de Magic: The Gathering</h1>
+    <div class="container">
+        <h1>Análise de Decks de Magic: The Gathering</h1>
 
-    <div>
-        <h3>Número de decks distintos: {{ num_decks_distintos }}</h3>
-        <h3>Número médio de cartas por deck: {{ media_cartas_por_deck }}</h3>
-    </div>
+        <div class="stats">
+            <h3>Número de decks distintos: {{ num_decks_distintos }}</h3>
+            <h3>Número médio de cartas por deck: {{ media_cartas_por_deck }}</h3>
+        </div>
 
-    <div>
-        <h3>Top 10 Decks Mais Caros</h3>
-        {{ graph_preco_decks | safe }}
-    </div>
+        <div class="charts">
+            <div class="chart-container">
+                <h3>Top 10 Decks Mais Caros</h3>
+                {{ graph_preco_decks | safe }}
+            </div>
 
-    <div>
-        <h3>Distribuição de Cores nos Comandantes</h3>
-        {{ graph_cores_comandantes | safe }}
-    </div>
+            <div class="chart-container">
+                <h3>Distribuição de Cores nos Comandantes</h3>
+                {{ graph_cores_comandantes | safe }}
+            </div>
 
-    <div>
-        <h3>Top 10 Cartas Mais Comuns Entre Decks</h3>
-        {{ graph_cartas_comuns | safe }}
+            <div class="chart-container">
+                <h3>Top 10 Cartas Mais Comuns Entre Decks</h3>
+                {{ graph_cartas_comuns | safe }}
+            </div>
+        </div>
     </div>
 </body>
 </html>
