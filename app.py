@@ -62,7 +62,7 @@ def index():
 
     return render_template('index.html',
                            num_decks_distintos=num_decks_distintos,
-                           media_cartas_por_deck="{:.2f}".format(media_cartas_por_deck),
+                           #media_cartas_por_deck="{:.2f}".format(media_cartas_por_deck),
                            graph_preco_decks=graph_preco_decks,
                            graph_cores_comandantes=graph_cores_comandantes,
                            graph_cartas_comuns=graph_cartas_comuns)
