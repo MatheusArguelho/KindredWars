@@ -32,14 +32,16 @@ tipos = ['Land', 'Creature', 'Artifact', 'Enchantment', 'Planeswalker', 'Battle'
 
 # Cria gráficos de barras para cada tipo
 tipos_graficos = {}
+top_x = 50  # Definindo o número de itens a serem mostrados nos gráficos (facilidade de alteração)
+
 for tipo in tipos:
     tipo_cartas = df[df['Tipo'].str.contains(tipo, case=False, na=False)]
     tipo_comum = tipo_cartas.groupby('Nome')['Deck'].nunique().sort_values(ascending=False)
 
-    fig = px.bar(tipo_comum.head(10),
-                 x=tipo_comum.head(10).index,
-                 y=tipo_comum.head(10).values,
-                 title=f"Top 10 Cartas do Tipo {tipo}",
+    fig = px.bar(tipo_comum.head(top_x),  # Usando top_x para definir o número de itens
+                 x=tipo_comum.head(top_x).index,
+                 y=tipo_comum.head(top_x).values,
+                 title=f"Top {top_x} Cartas do Tipo {tipo}",
                  labels={'x': 'Carta', 'y': 'Número de Decks'},
                  template='plotly')
 
@@ -56,14 +58,13 @@ for tipo in tipos:
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
-    # Gráfico de barras: Top 10 Decks Mais Caros
-    fig_preco_decks = px.bar(preco_por_deck.head(10),
-                             x=preco_por_deck.head(10).index,
-                             y=preco_por_deck.head(10).values,
-                             title="Top 10 Decks Mais Caros",
+    # Gráfico de barras: Top X Decks Mais Caros
+    fig_preco_decks = px.bar(preco_por_deck.head(top_x),  # Usando top_x para definir o número de itens
+                             x=preco_por_deck.head(top_x).index,
+                             y=preco_por_deck.head(top_x).values,
+                             title=f"Top {top_x} Decks Mais Caros",
                              labels={'x': 'Deck', 'y': 'Preço Total (USD)'},
                              template='plotly')
 
@@ -74,11 +75,11 @@ def index():
                                    title="Distribuição de Cores nos Comandantes",
                                    template='plotly')
 
-    # Gráfico de barras: Top 10 Cartas Mais Comuns Entre Decks (Sem 'Land')
-    fig_cartas_comuns = px.bar(cartas_comuns.head(10),
-                               x=cartas_comuns.head(10).index,
-                               y=cartas_comuns.head(10).values,
-                               title="Top 10 Cartas Mais Comuns Entre Decks (Sem 'Land')",
+    # Gráfico de barras: Top X Cartas Mais Comuns Entre Decks (Sem 'Land')
+    fig_cartas_comuns = px.bar(cartas_comuns.head(top_x),  # Usando top_x para definir o número de itens
+                               x=cartas_comuns.head(top_x).index,
+                               y=cartas_comuns.head(top_x).values,
+                               title=f"Top {top_x} Cartas Mais Comuns Entre Decks (Sem 'Land')",
                                labels={'x': 'Carta', 'y': 'Número de Decks'},
                                template='plotly')
 
@@ -95,8 +96,8 @@ def index():
                            graph_preco_decks=graph_preco_decks,
                            graph_cores_comandantes=graph_cores_comandantes,
                            graph_cartas_comuns=graph_cartas_comuns,
-                           tipo_graphs=tipo_graphs)
-
+                           tipo_graphs=tipo_graphs,
+                           top_x=top_x)  # Passa a variável top_x para o HTML, se precisar para referência
 
 if __name__ == '__main__':
     app.run(debug=True)
