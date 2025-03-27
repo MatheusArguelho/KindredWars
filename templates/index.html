@@ -65,6 +65,12 @@
                 {{ graph_preco_decks | safe }}
             </div>
 
+            <!-- Gráfico de Top X Decks por EDHREC Rank -->
+        <div class="graph">
+                <!-- O título do gráfico é gerado pelo Plotly, então removemos o título extra aqui -->
+                {{ graph_edhrec_rank_decks | safe }}
+        </div>
+
             <!-- Gráfico de Distribuição de Cores nos Comandantes, título já está no Plotly -->
             <div class="graph">
                 <!-- O título do gráfico é gerado pelo Plotly, então removemos o título extra aqui -->

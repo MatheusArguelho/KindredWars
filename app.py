@@ -27,6 +27,8 @@ comandantes_decks = df[df['Comandante'] == 1].groupby('Deck').first()
 preco_por_deck = df.groupby('Deck')['Preco_USD'].sum().sort_values(ascending=False)
 cores_comandantes = comandantes_decks['Cor'].value_counts()
 
+
+
 # Cartas mais comuns entre decks (sem contar "Land")
 cartas_comuns = df_sem_land.groupby('Nome')['Deck'].nunique().sort_values(ascending=False)
 
@@ -36,6 +38,10 @@ tipos = ['Land', 'Creature', 'Artifact', 'Enchantment', 'Planeswalker', 'Battle'
 # Cria gráficos de barras para cada tipo
 tipos_graficos = {}
 top_x = 50  # Definindo o número de itens a serem mostrados nos gráficos (facilidade de alteração)
+
+# Gráfico de barras: Top X Decks por EDHREC_Rank (dividido por 100)
+edhrec_rank_por_deck = df.groupby('Deck')['EDHREC_Rank'].sum() / 100  # Soma do EDHREC_Rank dividida por 100
+edhrec_rank_por_deck = edhrec_rank_por_deck.sort_values(ascending=False)
 
 for tipo in tipos:
     tipo_cartas = df[df['Tipo'].str.contains(tipo, case=False, na=False)]
@@ -128,7 +134,7 @@ def update_graph(tipo, cores):
 # Rota para a página principal do Flask
 @app.route('/')
 def index():
-    # Gráfico de barras: Top X Decks Mais Caros
+    # Gráfico de barras: Top X Decks Mais Caros (já existe no código)
     fig_preco_decks = px.bar(preco_por_deck.head(top_x),  # Usando top_x para definir o número de itens
                              x=preco_por_deck.head(top_x).index,
                              y=preco_por_deck.head(top_x).values,
@@ -136,14 +142,14 @@ def index():
                              labels={'x': 'Deck', 'y': 'Preço Total (USD)'},
                              template='plotly')
 
-    # Gráfico de pizza: Distribuição de Cores nos Comandantes
+    # Gráfico de pizza: Distribuição de Cores nos Comandantes (já existe no código)
     fig_cores_comandantes = px.pie(cores_comandantes,
                                    names=cores_comandantes.index,
                                    values=cores_comandantes.values,
                                    title="Distribuição de Cores nos Comandantes",
                                    template='plotly')
 
-    # Gráfico de barras: Top X Cartas Mais Comuns Entre Decks (Sem 'Land')
+    # Gráfico de barras: Top X Cartas Mais Comuns Entre Decks (Sem 'Land') (já existe no código)
     fig_cartas_comuns = px.bar(cartas_comuns.head(top_x),  # Usando top_x para definir o número de itens
                                x=cartas_comuns.head(top_x).index,
                                y=cartas_comuns.head(top_x).values,
@@ -151,12 +157,27 @@ def index():
                                labels={'x': 'Carta', 'y': 'Número de Decks'},
                                template='plotly')
 
+    # Criação do gráfico de EDHREC_Rank
+    fig_edhrec_rank_decks = px.bar(edhrec_rank_por_deck.head(top_x),  # Usando top_x para definir o número de itens
+                                   x=edhrec_rank_por_deck.head(top_x).index,
+                                   y=edhrec_rank_por_deck.head(top_x).values,
+                                   title=f"Top {top_x} Decks por EDHREC Rank (Dividido por 100)",
+                                   labels={'x': 'Deck', 'y': 'Soma de EDHREC_Rank / 100'},
+                                   template='plotly')
+
+    # Gráfico de EDHREC_Rank: Top X Decks por EDHREC Rank
+    fig_edhrec_rank_decks.update_layout(
+        autosize=True,
+        margin=dict(l=10, r=10, t=40, b=40)
+    )
+
     # Converte os gráficos para HTML
     graph_preco_decks = fig_preco_decks.to_html(full_html=False)
     graph_cores_comandantes = fig_cores_comandantes.to_html(full_html=False)
     graph_cartas_comuns = fig_cartas_comuns.to_html(full_html=False)
+    graph_edhrec_rank_decks = fig_edhrec_rank_decks.to_html(full_html=False)
 
-    # Criação dos gráficos para os tipos de carta
+    # Criação dos gráficos para os tipos de carta (também com títulos gerados pelo Plotly)
     tipo_graphs = {tipo: tipos_graficos[tipo] for tipo in tipos}
 
     # Passa as variáveis para o template HTML
@@ -165,6 +186,7 @@ def index():
                            graph_preco_decks=graph_preco_decks,
                            graph_cores_comandantes=graph_cores_comandantes,
                            graph_cartas_comuns=graph_cartas_comuns,
+                           graph_edhrec_rank_decks=graph_edhrec_rank_decks,  # Passa o novo gráfico
                            tipo_graphs=tipo_graphs,
                            top_x=top_x)  # Passa a variável top_x para o HTML, se precisar para referência
 
