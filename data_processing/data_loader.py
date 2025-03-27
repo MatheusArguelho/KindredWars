@@ -3,17 +3,47 @@ import pandas as pd
 
 def load_and_preprocess_data(filepath):
     """Carrega e pré-processa os dados do arquivo CSV."""
-    df = pd.read_csv(filepath)
+    try:
+        df = pd.read_csv(filepath)
 
-    # Filtra decks inválidos
-    df = df[~df['Deck'].str.endswith('INVALIDO', na=False)]
+        # Verifica colunas existentes (debug)
+        #print("\nColunas disponíveis no CSV:", df.columns.tolist())
 
-    # Converte colunas numéricas
-    df['Custo'] = pd.to_numeric(df['Custo'], errors='coerce')
-    df['Preco_USD'] = pd.to_numeric(df['Preco_USD'], errors='coerce')
-    df['EDHREC_Rank'] = pd.to_numeric(df['EDHREC_Rank'], errors='coerce')
+        # Padroniza nomes de colunas (case insensitive)
+        df.columns = df.columns.str.strip().str.lower()
 
-    # Filtra cartas que não são do tipo "Land"
-    df_sem_land = df[df['Tipo'] != 'Basic Land']
+        # Renomeia colunas para nomes esperados
+        column_mapping = {
+            'preco_usd': 'preco_usd',
+            'edhrec_rank': 'edhrec_rank',
+            'deck': 'deck',
+            'comandante': 'comandante',
+            'cor': 'cor',
+            'tipo': 'tipo',
+            'nome': 'nome'
+        }
 
-    return df, df_sem_land
+        # Aplica o mapeamento de colunas
+        for original, new in column_mapping.items():
+            if original in df.columns:
+                df.rename(columns={original: new}, inplace=True)
+
+        # Filtra decks inválidos
+        df = df[~df['deck'].str.endswith('INVALIDO', na=False)]
+
+        # Converte colunas numéricas
+        df['preco_usd'] = pd.to_numeric(df['preco_usd'], errors='coerce').fillna(0)
+        df['edhrec_rank'] = pd.to_numeric(df['edhrec_rank'], errors='coerce').fillna(0)
+
+        # Debug: mostra amostra dos dados
+        #print("\nAmostra dos dados carregados:")
+        #print(df[['deck', 'preco_usd', 'edhrec_rank', 'cor']].head())
+
+        # Filtra cartas que não são do tipo "Land"
+        df_sem_land = df[~df['tipo'].str.contains('land', case=False, na=False)]
+
+        return df, df_sem_land
+
+    except Exception as e:
+        print(f"Erro ao carregar dados: {str(e)}")
+        raise

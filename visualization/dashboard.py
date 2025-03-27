@@ -2,6 +2,8 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import dash
+import pandas as pd
+
 
 def create_dash_app(server, df, tipos):
     """Cria e configura a aplicação Dash."""
