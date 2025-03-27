@@ -130,30 +130,32 @@
         <p>Análise estatística de {{ num_decks_distintos }} decks distintos</p>
     </div>
 
-    <!-- Primeira linha de gráficos -->
+    <!-- Gráfico: Decks mais caros -->
     <div class="graph-row">
-        <!-- Gráfico: Decks mais caros -->
         <div class="graph-container">
             <h3 class="graph-title">Top {{ top_x }} Decks Mais Caros</h3>
             {{ graph_preco_decks|safe }}
         </div>
+    </div>
 
-        <!-- Gráfico: Distribuição de cores -->
+    <!-- Gráfico: Popularidade dos decks -->
+    <div class="graph-row">
+        <div class="graph-container">
+            <h3 class="graph-title">Top {{ top_x }} Decks por Popularidade</h3>
+            {{ graph_edhrec_rank_decks|safe }}
+        </div>
+    </div>
+
+    <!-- Gráfico: Distribuição de cores -->
+    <div class="graph-row">
         <div class="graph-container">
             <h3 class="graph-title">Distribuição de Cores nos Comandantes</h3>
             {{ graph_cores_comandantes|safe }}
         </div>
     </div>
 
-    <!-- Segunda linha de gráficos -->
+    <!-- Gráfico: Cartas mais comuns -->
     <div class="graph-row">
-        <!-- Gráfico: Popularidade dos decks -->
-        <div class="graph-container">
-            <h3 class="graph-title">Top {{ top_x }} Decks por Popularidade</h3>
-            {{ graph_edhrec_rank_decks|safe }}
-        </div>
-
-        <!-- Gráfico: Cartas mais comuns -->
         <div class="graph-container">
             <h3 class="graph-title">Top {{ top_x }} Cartas Mais Comuns</h3>
             {{ graph_cartas_comuns|safe }}
