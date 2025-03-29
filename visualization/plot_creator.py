@@ -66,9 +66,9 @@ def create_plots(analysis_results, tipos, top_x=50):
     # ==============================================
     if not analysis_results['preco_por_deck'].empty:
         plots['preco_decks'] = px.bar(
-            x=analysis_results['preco_por_deck'].head(top_x).index,
-            y=analysis_results['preco_por_deck'].head(top_x).values,
-            title=f"Top {top_x} Decks Mais Caros (Preço Total)",
+            x=analysis_results['preco_por_deck'].head(64).index,
+            y=analysis_results['preco_por_deck'].head(64).values,
+            title=f"Top Decks Mais Caros (Preço Total)",
             labels={'x': 'Deck', 'y': 'Preço (USD)'},
             template='plotly_white'
         )
@@ -120,9 +120,9 @@ def create_plots(analysis_results, tipos, top_x=50):
     # ==============================================
     if not analysis_results['edhrec_rank_por_deck'].empty:
         plots['edhrec_rank_decks'] = px.bar(
-            x=analysis_results['edhrec_rank_por_deck'].head(top_x).index,
-            y=analysis_results['edhrec_rank_por_deck'].head(top_x).values,
-            title=f"Top {top_x} Decks por Popularidade (EDHREC Rank)",
+            x=analysis_results['edhrec_rank_por_deck'].head(64).index,
+            y=analysis_results['edhrec_rank_por_deck'].head(64).values,
+            title=f"Top Decks por Popularidade (EDHREC Rank)",
             labels={'x': 'Deck', 'y': 'Pontuação (Rank/100)'},
             template='plotly_white'
         )
