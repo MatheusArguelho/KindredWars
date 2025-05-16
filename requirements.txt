@@ -3,3 +3,4 @@ Flask
 pandas==2.2.3
 plotly==6.0.1
 gunicorn==23.0.0
+Flask-Caching==2.1.0
